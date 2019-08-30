@@ -1,0 +1,50 @@
+\section{Background} \label{sec:background}
+
+Image displaying, although seemingly straightforward, is actually a non-trivial process in Android apps and can be subject to various performance defects.
+In this section we introduce the image displaying process in Android apps and its related inefficient image displaying (IID) issues.
+
+% Image displaying is very common in Android apps, which is a very important carrier of information transmission. When an image is displayed in an Android app, it can cause high computational resources overhead (e.g., CPU and RAM) and involves various and complex steps, especially when the concerned image is large. In this section, we describe the resource consumption and the process of image displaying in Android apps.   
+%jyy's comments: {I don't think a long introduction is very necessary here. If we have space, we can add it back later.}
+
+\subsection{Image Displaying in Android Apps}
+
+The process of image displaying in Android apps consists of the following four phases, which are all performance-critical and energy-consuming~\cite{handle_image}:
+
+\begin{itemize}  
+  \item \emph{Image loading} for reading the external representation of an image (from an external source, e.g., a URL, file, or input stream) and decoding the image into an Android-recognizable in-memory object (e.g., \code{Bitmap}, \code{Drawable}, and \code{BitmapDrawable}).
+
+  \item \emph{Image transformation} for post-decoding image processing, in which a decoded image object is resized, reshaped,
+  or specially processed for fitting in a designated application scenario (e.g., a cropped and enhanced thumbnail).
+
+  \item \emph{Image storage} for managing a decoded and/or transformed image object, particularly in a cache, for later rendering.
+  Caching can also save precious CPU/GPU cycles for image decoding and transformation, but it would incur significant space overhead.
+  \item \emph{Image rendering} for physically displaying an image object on an Android device's screen.
+  Images are rendered natively by the Android framework~\cite{Android_framework}.
+\end{itemize}
+
+\subsection{Inefficient Image Displaying (IID)}
+
+Image displaying is both computation- and memory-intensive. Displaying a full resolution image on a high-resolution display may cost:
+
+\begin{itemize}
+  \item hundreds of milliseconds of CPU \emph{time}~\cite{wang2016profiling}, which can cause an observable lag, and
+  \item tens of megabytes of \emph{memory}~\cite{image_size}, which can drain an app's limited memory.
+\end{itemize}
+
+Therefore, the efficiency of image displaying on CPU- and memory-constrained mobile devices is of critical importance.
+Inefficiently displayed images can severely impact app functions or user experiences:
+
+\begin{enumerate}
+  \item Decoding images in the UI thread can significantly degrade an app's performance, causing its slow responsiveness or even ``app-not-responding'' anomalies%
+\footnote{\url{https://github.com/wordpress-mobile/ WordPress- Android/issues/5777}.}.
+  \item Image objects not being freed in time can consume significantly large amounts of memory, leading to \code{OutOfMemoryError} and unexpected app terminations%
+\footnote{\url{https://github.com/AnimeNeko/Atarashii/issues/6}.}.
+  \item Improperly stored (cached) images may cause repeatedly (and unnecessary) processing of the same images, resulting in meaningless performance degradation and energy waste%
+\footnote{\url{https://github.com/TeamNewPipe/NewPipe/pull/166}.}.
+\end{enumerate}
+
+We thus define an \emph{inefficient image displaying} (IID) issue as a non-functional defect in an Android app's image displaying implementation (e.g., improper image decoding) that causes performance degradation (e.g., GUI lagging or memory bloat) and even more serious consequences (e.g., app crash).
+
+To better understand and detect IID issues,
+in this paper we conduct an empirical study to systematically investigate IID issues in Android apps,
+and work for automated IID issue detection technique based on our empirical study results.

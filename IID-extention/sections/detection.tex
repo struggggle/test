@@ -1,0 +1,62 @@
+\section{Static Detection of IID Issues} \label{sec:detection}
+
+We proposed a static IID issue detector, TAPIR, based on a set of anti-pattern rules extracted from our empirical study results.
+This section describes the design (in Section~\ref{subsec:tapir-design}) and implementation (in Section~\ref{subsec:tapir-impl}) of TAPIR.
+
+\subsection{IID Issue Anti-pattern Rules} \label{subsec:tapir-design}
+
+By further inspecting the empirical study results and IID issue cases,
+we observed that most IID issues are correlated with image decoding APIs concerning \emph{external} images,
+which are essentially a small portion of all image decoding APIs.
+
+In particular, only the nine following Android~\cite{Android_API} official APIs are correlated with IID%
+\footnote{\code{setImageURI} and \code{setImageViewUri} both decode and display an image.}:
+
+\begin{Verbatim}[fontsize=\footnotesize]
+decodeFile      decodeFileDescriptor decodeStream
+decodeByteArray setImageURI          decodeRegion
+createFromPath  createFromStream     setImageViewUri
+\end{Verbatim}
+
+We also observed two popular third-party APIs (APIs invoking third-party library functionalities, not APIs used inside third-party libraries),
+which are associated with at least two apps in the studied IID issues:
+
+\begin{Verbatim}[fontsize=\footnotesize]
+universalimageloader.core.ImageLoader.
+  getInstance().displayImage
+Glide.load
+\end{Verbatim}
+We call the above eleven image decoding and third-party APIs \emph{issue inducing APIs}. IID issues can occur when these APIs are invoked under issue-inducing \emph{rules},
+which consist of API invocation sequence and/or parameter value combinations. These issue-inducing \emph{rules} are characterized in Table~\ref{tab:rules},
+which are matched against in the TAPIR static analyzer.
+
+\subsection{The TAPIR Static Analyzer} \label{subsec:tapir-impl}
+
+We implemented the pattern-and-rule based static analyzer on top of Soot~\cite{soot}.
+TAPIR takes an Android app binary (\code{apk}) file as input and uses \code{dex2jar}~\cite{dex2jar} to obtain a set of Java bytecode files.
+It then builds the app's context-insensitive call graph,
+with a few implicit method invocation relations being added, which are used to check rule \#4:
+
+\begin{enumerate}
+  \item The methods of \code{AsyncTask.execute} and \code{Async\allowbreak{}Task.\allowbreak{}doInBackground} in the same class have an implicit invocation relationship.
+  \item The methods of \code{Thread.start} and \code{Thread.run} in the same class should have an implicit invocation relationship.
+\end{enumerate}
+
+%\newcommand{\isite}{i-site\xspace}
+
+Then TAPIR checks each potential issue-inducing API invocation site (\emph{IS} for short) against the anti-pattern rules in Table~\ref{tab:rules} using standard program analysis techniques.
+For each \emph{IS}, we can thus obtain:
+(1) the data-flow of method parameters by a backward slicing, and
+(2) the usages of decoded image objects by a forward slicing. In particular, TAPIR checks the anti-pattern rules as follows:
+
+\begin{enumerate}
+  \item Rule \#1 (\emph{image decoding without resizing}) is checked by analyzing the data-flow of the \code{Option} parameter,
+  and a warning is raised if there lacks the \code{Option} parameter or its value satisfies the condition specified in Table~\ref{tab:rules}.
+  \item Rule \#2 and \#3 (\emph{loop-based redundant image decoding}) are equivalent to checking the call graph reachability between the loop-related method invocations and the \emph{IS}. Furthermore, TAPIR also checks whether there is any data flow between the decoded image and cache-related functions or argument (in particular, \code{LruCache.put}, \code{DiskCacheStrategy.All} ) to exclude non-IID cases.
+  \item Rule \#4 (\emph{image decoding in UI event handlers}) is another case of checking the reachability between the \emph{IS} and method invocations of \code{Thread.\allowbreak{}run}, \code{AsyncTask.\allowbreak{}Do\allowbreak{}In\allowbreak{}Background}, or \code{Intent\allowbreak{}Service.\allowbreak{}onHandleIntent}.
+  \item Rules \#5, \#6, and \#7 (\emph{unbounded image caching}) follow the same pattern of checking whether a series of designated method invocations are reachable in the call graph.
+\end{enumerate}
+
+For each \emph{IS} matching at least one anti-pattern rule,
+an inefficient image display warning is generated,
+which can be further validated by the respective app developer.

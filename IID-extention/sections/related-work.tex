@@ -1,0 +1,42 @@
+\section{Related Work}\label{sec:related-work}
+Performance has become a major concern for mobile app developers and has been extensively studied in our community.
+In this section, we briefly summarize and discuss existing literatures on this concern.
+
+\smalltitle{Understanding performance issues in mobile apps}
+Understanding performance issues is of critical importance before tackling them.
+Huang et al.~\cite{huang2010anatomizing} identified several important factors that may impact user-perceived network latencies in mobile apps.
+Liu et al.\cite{liu2014characterizing} studied the characteristics of Android app performance issues and identified their common patterns. These findings can support performance issue avoidance, testing, debugging, and analysis for Android apps. 
+Nejati et al.~\cite{nejati2016depth} performed an in-depth investigation of mobile browser performance by pairwise comparisons between mobile and non-mobile browsers.
+Huang et al.~\cite{huang2017shuffledog} conducted a systematic measurement study to quantify user-perceived latencies with and without background workloads.
+Rosen et al.~\cite{rosen2017push} investigated the benefits and challenges of using Server Push on mobile devices for improving mobile performance.
+
+Several studies provide some clues for understanding and detecting IID issues as studied in this work.
+Wang et al.~\cite{wang2016profiling} provided evidence that the response time of image decoding can grow significantly as the image's size increases, and thus IID may be a significant source of performance issues,
+while Carette et al.~\cite{carette2017investigating} discussed that large images may potentially impact the performance of Android apps. 
+
+These studies either focus on general performance issues in Android apps and thus provide limited insights to tackle specific IID issues,
+or do not systematically investigate IID issues in practical Android apps.
+To the best of our knowledge, this paper is the first systematic empirical study of IID issues using real-world Android apps,
+and provides key insights (e.g., common anti-patterns derived from real-world issues and patches) on understanding and detection of IID issues in Android apps.
+
+\smalltitle{Diagnosing and detecting performance issues in mobile apps} 
+Diagnosing and detecting performance issues is the basis of fixing and optimizing for performance issues in mobile apps.
+Mantis\cite{kwon2013mantis} estimated the execution time for Android apps on given inputs to identify problem-inducing inputs that can slow down an app's execution. 
+ARO\cite{qian2011profiling} monitored cross-layer interactions (e.g., those between the app layer and the resource management layer) to help disclose inefficient resource usage, which can commonly cause performance degradation to Android apps. 
+AppInsight\cite{ravindranath2012appinsight} instrumented app binaries to identify critical paths (e.g., slow execution paths) in handling user interaction requests, so as to disclose root causes for performance issues in mobile apps. 
+Panappticon\cite{zhang2013panappticon} monitored the application, system, and kernel software layers to identify performance problems stemming from application design flaws, underpowered hardware, and harmful interactions between apparently unrelated applications, and further revealed performance issues from inefficient platform code or problematic app interactions.
+Nistor et al.\cite{nistor2014suncat} analyzed sequences of calls to String getter methods to understand the impact of larger inputs on a user’s perception in Windows Phone apps. 
+Lin et al.\cite{lin2014retrofitting} proposed an approach, ASYNCHRONIZER, to automatically refactor long-running operations into asynchronous tasks.  
+Kang et al.~\cite{kang2016diagdroid} tracked asynchronous executions with a dynamic instrumentation approach and profiled them in a task granularity, equipping it with low-overhead and high compatibility merits.
+
+For the work on diagnosing and detecting IID issues, 
+Liu et al.\cite{liu2014characterizing} proposed an approach based on static analysis, which can possibly identify one kind of IID issues: performing bitmap resizing operations in the UI thread. 
+Gao et al.~\cite{gao2017every} performed two UI rendering analyses to help app developers pinpoint rendering problems and resolve short delays. However, these pieces of work can cover only a small proportion of IID issues studied in this paper. In our work, we proposed both common anti-patterns and an effective static analyzer TAPIR to detect real-world IID issues of four types.
+
+\smalltitle{Fixing and optimizing performance issues in mobile apps}
+After performance issue detection, performance optimization is the necessary next step. 
+Lee et al.~\cite{lee2015outatime} proposed a technique that can render speculative frames of future possible outcomes, delivering them to the client device entire RTT ahead of time, and recover quickly from possible mis-speculations when they occur to mask up the network latency. 
+Huang et al.~\cite{huang2017shuffledog} developed a lightweight tracker to accurately identify all delay-critical threads that contribute to the slow response of user interactions, and build a resource manager that can efficiently schedule various system resources including CPU, I/O, and GPU, for optimizing the performance of these threads. 
+Zhao et al.~\cite{zhao2018leveraging} leveraged the string analysis and callback control flow analysis to identify HTTP requests that should be prefetched to reduce the network latency in Android apps. 
+Lyu et al.~\cite{lyu2018remove} rewrote the code that places database writes within loops to reduce the energy consumption and improve runtime performance of database operations in Android apps. 
+Nguyen et al.~\cite{nguyen2015reducing} reduced the application delay by prioritizing reads over writes, and grouping them based on assigned priorities. In our work, the detection results of TAPIR provide the location and anti-patterns of its detected IID issues in Android apps, which can then be used to help developers quickly fix IID issues as our experiments and case analyses show.

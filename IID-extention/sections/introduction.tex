@@ -1,0 +1,54 @@
+\section{Introduction}
+
+Media-intensive mobile applications (apps for short) must carefully implement their CPU- and memory-demanding image displaying procedures.
+Otherwise user experiences can be significantly affected~\cite{handle_image}.
+For example, inefficiently displayed images can lead to app crash, UI lagging, memory bloat, or battery drain,
+and finally make users abandon the concerned apps even if they are functionally perfect~\cite{performance}.
+
+In this paper, we empirically found that mobile apps often suffer from
+\emph{inefficient image displaying} (IID) \emph{issues}
+in which the image displaying code contains non-functional defects that cause performance degradation or even more serious consequences, such as the app crashing or no longer responding.
+Despite the fact that existing work has considered IID issues to some extent
+(within the scope of general performance bugs~\cite{liu2014characterizing,carette2017investigating, wang2016profiling, linares2015developers, Liu:SW15} or image displaying performance analysis~\cite{kwon2013mantis,gao2017every}),
+there still lacks a thorough study of IID issues for mobile apps,
+particularly for source-code-level insights that can be leveraged in program analysis for automated IID issue detection or even fixing.
+
+To facilitate deeper understanding of IID issues,
+this paper presents an empirical study towards characterizing IID issues in mobile apps.
+We carefully localized 162 IID issues (in 36 apps) from 1,826 issue reports and pull requests in 243 well-maintained open-source Android apps in F-Droid~\cite{f-droid}. Useful findings include:
+
+\begin{enumerate}
+  \item Most IID issues cause app crash (30.9\%) or slowdown (45.1\%), and handling lots of images and/or large images are the primary causes.
+  This finding is useful for developing reasonable workloads and test oracles for dynamic manifestation and detection of IID issues in Android apps.
+  \item A few root causes have covered most (90.1\%) examined IID issues: non-adaptive image decoding (45.1\%), repeated and redundant image decoding (26.5\%), UI-blocking image displaying (11.1\%), and image leakage (7.4\%). We also extracted sufficient conditions for localizing these issues in an Android app's execution trace, which would benefit both dynamic and static analyzers.
+  \item Certain anti-patterns can be strongly correlated with IID issues: image decoding without resizing (23.4\%), loop-based redundant image decoding (22.2\%), image decoding in UI event handlers (11.1\%), and unbounded image caching (4.3\%).
+  This finding lays the foundation of our pattern-based lightweight static IID issue detection technique.
+  \item \TODO{add other findings}
+\end{enumerate}
+
+To the best of our knowledge,
+this paper presents the first systematic empirical study of IID issues in real-world Android apps,
+and provides key insights on understanding, detection, and fixing of IID issues. 
+
+Based on these findings,
+we design and implement TAPIR, a static analyzer for IID issue detection in Android apps.
+We experimentally validated the effectiveness of TAPIR, and applied it to the latest versions of all 243 studied apps.
+TAPIR reported surprisingly encouraging results that 43 \emph{previously-unknown} IID issues in 16 apps (24 of the 43 issues are from eight apps that previously suffered from IID issues) were manually confirmed as true positives and reported to respective developers,
+among which 16 have been confirmed by the developers and 13 have been fixed.
+
+In summary, our paper makes the following contributions:
+
+\begin{enumerate}
+	
+  \item We conducted a systematic empirical study of IID issues in real-world Android apps. The findings provide key insights to facilitate future research, and our dataset of IID issues are publicly available for follow-up studies%
+\footnote{\url{https://github.com/IID-dataset/IID-issues}.}.
+
+  \item For a more intuitive presentation and understanding of IID issues, we extracted IID issues' code slices and graphically represented them in a standard format. The graphical representation of IID issues are publicly available%
+\footnote{\url{https://github.com/IID-dataset/IID-issues-graphical-representation}.}.
+  
+  \item Based on our empirical findings, we devised a static pattern-based IID issue detection technique, TAPIR, and validated its effectiveness using real-world Android apps.
+\end{enumerate}
+
+In our preliminary conference version of this work~\cite{li2019characterizing} , we conducted an empirical study on 162 IID issues and designed TAPIR to detect potential IID issues in Android apps. In this journal version, we extended our previous work from the following perspectives:(1)We extracted 162 IID issues' code slices and graphically represented them in a standard format. (2)We extended answers to our research questions (i.e., RQ1, RQ2, and RQ3) based on further empirical study results. (3)We additionally studied and answered two important research questions (i.e., RQ4 and RQ5) to provide a more comprehensive understanding for IID issues. (4) We provided more details of the empirical study, issue examples, technique design, and experimental setup.
+
+The rest of this paper is organized as follows. Section~\ref{sec:background} introduces the background knowledge of image displaying in Android apps. Section~\ref{sec:study} presents the methodology of our empirical study for IID issues in Android apps and discusses our empirical findings. Section~\ref{sec:detection} presents the design and implementation of our TAPIR tool. Section~\ref{sec:evaluation} experimentally evaluates TAPIR with popular and open-source Android apps and discusses its results and the threats to validity. Section~\ref{sec:related-work} presents related work, and Section~\ref{sec:conclusion} concludes this paper.\TODO{need to be updated}

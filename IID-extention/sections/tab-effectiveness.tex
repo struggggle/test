@@ -1,0 +1,26 @@
+\begin{landscape}
+\begin{table*}
+\centering  
+\caption{Effectiveness Validation Results. Each known IID issue is either a true positive (TP) or a false negative (FN).}
+\label{subject_part_1}
+\begin{tabular}{ccccccccccc}  
+\toprule
+\rowhead App Name \cat{Category, Downloads} & Revision(s) & LOC & \#IID (IRep/PR ID) & AP1 & AP2 & AP3 & AP4& TP & FN\\
+\midrule
+\odrow \subj{OpenNoteScanner} \cat{Education, 10K+}    & \rev{d34135e}                & 2.7K      & 2 (\#12)                 & 2 & 0 & 0 & 0 & 2  & 0 \\  
+\evrow \subj{Subsonic}        \cat{Multimedia, 500K+}  & \rev{68496f6}                & 23.8K     & 1 (\#299)                & 0 & 1 & 0 & 0 & 1  & 0 \\   
+\odrow \subj{WordPress}       \cat{Internet, 5M+}        & \rev{1a8fa65}, \rev{8429f0a} & 95.8K     & 2 (\#5290, \#5777)       & 1 & 0 & 1 & 0 & 2  & 0 \\  
+\evrow \subj{PhotoAffix}      \cat{Multimedia, 10K+}   & \rev{3d8236e}                & 1.4K      & 2 (\#5)                  & 2 & 0 & 0 & 0 & 2  & 0 \\  
+\odrow \subj{Kontalk}         \cat{Internet, 10K+}     & \rev{3f2d89d}, \rev{9185a80} & 19.6K     & 3 (\#234, \#269, \#789)  & 2 & 0 & 1 & 0 & 3  & 0 \\  
+\evrow \subj{OneBusAway}      \cat{Navigation, 500K+}  & \rev{9f6feea}                & 15.7K     & 2 (\#730)                & 2 & 0 & 0 & 0 & 2  & 0 \\
+\odrow \subj{NewPipe}         \cat{Multimedia, 10K+}   & \rev{4df4f68}                & 3.5K      & 5 (\#166)                & 0 & 5 & 0 & 0 & 5  & 0 \\
+\evrow \subj{MoneyManagerEx}  \cat{Money, 100K+}    & \rev{dcf4b87}                & 63.8K     & 1 (\#938)                & 1 & 0 & 0 & 0 & 1  & 0 \\
+\odrow \subj{BlueAlliance}    \cat{Education, 10K+}    & \rev{c081671}                & 31.4K     & 1 (\#588)                & 1 & 0 & 0 & 0 & 1  & 0 \\
+\midrule
+\rowhead Total & & & 19 & 11 & 6 & 2 & 0 & 19 & 0 \\\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item Columns AP1--AP4 respectively denote the number of studied IID issues categorized as a specific anti-pattern.
+\end{tablenotes}
+\end{table*}
+\end{landscape}

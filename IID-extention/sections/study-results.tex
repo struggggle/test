@@ -1,0 +1,294 @@
+\subsection{Empirical Study Results}
+
+\subsubsection{RQ1: What are the triggering conditions and consequences of IID issues?}
+
+We answer RQ1 by manual inspection of textural information in the collected IReps/PRs,
+which contain descriptions about IID issues from the perspective of app users.
+The overall results are summarized as the follows:
+
+\finding{blue}{
+\textbf{Finding 1}. Most IID issues can cause app \emph{crash} (30.9\%) or \emph{slowdown} (45.1\%).
+In the issues with clearly described triggering conditions,
+handling \emph{lots} of images (60.0\%) and \emph{large} images (41.6\%) are the major causes.}
+
+This finding is consistent with our intuitions:
+IID issues typically occur in media-intensive apps,
+and may result in severe impact on user experiences%
+\footnote{An IID issue may have multiple consequences or causes, and thus the sum of the concerned percentages may exceed 100$\%$.}.
+Their consequences can be categorized as follows:
+
+\begin{itemize}
+	\item \emph{App crash} (50/162, 30.9\%) is the most severe consequence, which is mostly caused by \code{OutOfMemoryError} in the memory allocation for storing a large image%
+\footnote{\url{https://github.com/the-blue-alliance/the-blue-alliance-android/issues/588}.}.
+	\item \emph{App slowdown} (73/162, 45.1\%) is the most common consequence, which includes GUI lagging%
+\footnote{\url{https://github.com/nikclayton/android-squeezer/issues/171}.} and slow image displaying%
+\footnote{\url{https://github.com/kontalk/androidclient/issues/789}.}. 
+	\item \emph{Memory bloat} (23/162, 14.2\%) in which an apps' consumed memory keeps growing but does not lag or crash the app yet%
+\footnote{\url{https://github.com/romannurik/muzei/issues/383}.}, although the app may unnecessarily stop background activities and affect user experiences.
+	\item \emph{Abnormal image displaying} (14/162, 8.6\%) occurs when an app's memory is insufficient for decoding large images but does not cause app crash yet, which may also trigger frequent GC (Garbage Collection) and impact user experiences.
+  \item \emph{Application not responding} (2/162, 1.2\%) is the extreme case of app slowdown and is usually caused by an app performing time-consuming image displaying operations in the UI thread%
+\footnote{\url{https://github.com/ccrama/Slide/issues/1639}.}.
+	\item \emph{Others} (13/162, 8.0\%) can also result in bad user experiences but their IReps/PRs lack further details for inspection.
+\end{itemize}
+
+We also found that 125 of the 162 studied IID issues contain explicit descriptions about their triggering conditions.
+All these triggering conditions concern to handling \emph{large} images (50/125, 40.0\%), handling \emph{lots} of images (73/125, 58.4\%), or both (2/125, 1.6\%).
+For these cases, inefficient handling of large/lots of images mostly cause app crash/slowdown, respectively.
+
+These findings, although seemingly straightforward, provide actionable hints for reasonable workload designs and possible test oracles for the automated detection of IID issues.
+Simply feeding an app with reasonably large-amount and large-size images would suffice as an IID testing adversary,
+and test oracles can also be accordingly designed around the studied consequences.
+
+\medskip
+
+\subsubsection{RQ2: What are the root causes of IID issues?} \label{subsec:rq2-answer}
+
+To further understand on the source-code level how IID issues have occurred,
+we manually inspected the issues' associated patches to recognize their root causes.
+The overall results are summarized as follows:
+
+\finding{blue}{
+  \textbf{Finding 2}. Only a few root causes cover most (90.1\%) inspected IID issues: non-adaptive image decoding (45.1\%), repeated and redundant image decoding (26.5\%), UI-blocking image displaying (11.1\%), and image leakage (7.4\%).
+}
+
+First, this finding reveals that existing performance bug detectors may have covered only a narrow range of IID issues and it is worthwhile to develop IID-specific analysis techniques.
+For example, the existing pattern-based analysis~\cite{liu2014characterizing} detects only part image decoding in the UI thread, the existing resource leakage analysis~\cite{wu2016light} can be expanded to manual image resource management (the tool itself does not cover), existing image displaying performance analysis~\cite{gao2017every} can help developers improve the rendering performance of slow image displaying.
+
+Besides, this finding also suggests that \emph{static program analysis techniques} concerning these particularly recognized root causes may be effective for detecting IID issues,
+as long as one can semantically model the image displaying process in an app's source code,
+or find particular code anti-patterns which correlate to these root causes (studied later in Section~\ref{subsec:rq3-answer}).
+
+\newcommand{\edisplay}{e_{\mathrm{disp}}}
+\newcommand{\edecode}{e_{\mathrm{dec}}}
+\newcommand{\depends}[2]{#2\to#1}
+\newcommand{\im}{\mathit{im}}
+
+The root causes of IID issues are illustrated using the \emph{execution traces} of an app based on a simplified data-flow model.
+Suppose that executing an app yields a sequence of chronologically sorted \emph{events} $E=\{e_1,e_2,\ldots,e_m\}$.
+Some events may be the results of image-related API invocations. Each of such events is associated with an image object $\im_{w\times h}$ in the heap of resolution $w\times h$.
+We use the notation $\depends{e'}{e}$ to denote that event $e'$ is data-dependent on event $e$, i.e.,
+the result of $e'$ is computed directly or indirectly involving the result of $e$.
+
+\smalltitle{Non-adaptive image decoding}
+Nearly half (73/162, 45.1\%) of the issues are simply caused by directly decoding a large image without considering the actual size of the widget that displays this image, resulting in significant performance degradation and/or crash.
+A typical example is to decode a full-resolution image for merely displaying a thumbnail%
+\footnote{\url{https://github.com/opendatakit/collect/issues/1237}.}, which can waste thousands times of CPU cycles and memory.  
+
+For a non-adaptive image decoding case, there exists an image object $\im_{w\times h}$ associated with event $\edecode\in E$ which is the result of an image decoding API invocation,
+and $\im$ is finally displayed by event $\edisplay\in E$, which is an image displaying API invocation and $\depends{\edisplay}{\edecode}$. However, the actual displayed image $\im'_{w'\times h'}$ has
+$w > w' \land h > h'$.
+
+\smalltitle{Repeated and redundant image decoding}
+Quite a few (43/162, 26.5\%) issues are due to improper storage (particularly, caching) for images such that the same images maybe repeatedly and redundantly decoded,
+causing unnecessarily performance degradation and/or battery drain.
+An indicator of this type of IID issues is that there are two image decoding API invocation events
+$\edecode,\edecode'\in E$ whose associated images $\im$ and $\im'$ are identical, i.e., $\im_{w\times h}=\im'_{w\times h}$.
+
+\smalltitle{UI-blocking image displaying}
+Some (18/162, 11.1\%) issues are caused by decoding images in the UI thread in an app,
+even if this has been explicitly discouraged in the Android documentation~\cite{handle_image}.
+A typical example is to decode large images in the UI thread%
+\footnote{\url{https://github.com/kontalk/androidclient/issues/789}.}, which causes UI blocking, leading obviously slow responsiveness.
+
+\smalltitle{Image leakage}
+Some (12/162, 7.4\%) issues are caused by memory (by image objects) leakage such that inactive images cannot be effectively garbage-collected.
+Memory leakage is another major cause of \code{OutOfMemoryError} and has been extensively studied in the existing literatures~\cite{xu2008precise, yan2014leakchecker}.
+
+\medskip
+
+\subsubsection{RQ3: Are there common anti-patterns for IID issues?} \label{subsec:rq3-answer}
+
+Following the analysis of root causes in Section~\ref{subsec:rq2-answer},
+we inspected the source code of concerned IID issues to identify whether IID issues are related to any particular code \emph{anti-patterns}.
+The overall results are summarized as follows:
+
+\finding{blue}{
+  \textbf{Finding 3}. Certain anti-patterns are strongly correlated to IID issues: image decoding without resizing (23.4\%),
+  loop-based redundant image decoding (22.2\%),
+  image decoding in UI event handlers (11.1\%), and
+  unbounded image caching (4.3\%).
+  Together with additional bug types mentioned by existing research~\cite{wu2016light, gao2017every} (29.1\%), 90.1\% of the examined IID issues could be identified.
+}
+
+These anti-patterns are a firm basis for developing effective static analysis techniques for detecting IID issues, which are further discussed in Section~\ref{sec:detection} and evaluated in Section~\ref{sec:evaluation}.
+
+\begin{figure}
+	\centering
+	\begin{lstlisting}
+ public class AztecImageLoader implements Html.ImageGetter {
+   public void loadImage(String url, ..., int maxWidth) {
+@-    Bitmap bitmap = BitmapFactory.decodeFile(url);@
+~+    int orientation = ImageUtils.getOrientation(..., url);~
+~+    byte[] bytes = ImageUtils.createThumbnail(Uri.parse(url), maxWidth, ...);~
+~+    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);~
+     BitmapDrawable bitmapDrawable = new BitmapDrawable(context.getResources(), bitmap);
+     callbacks.onImageLoaded(bitmapDrawable);
+   } }
+\end{lstlisting}
+	\caption{Image decoding without resizing in WordPress issue 5701 (simplified)}
+	\label{pattern1}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{lstlisting}
+ public class PodcastListAdapter extends ArrayAdapter<GpodnetPodcast> { 
+   public View getView(int position, ...) {
+     GpodnetPodcast podcast = getItem(position);
+     Glide.with(convertView.getContext())
+          .load(podcast.getLogoUrl())
+          .placeholder(R.color.light_gray)
+@-         .diskCacheStrategy(DiskCacheStrategy.SOURCE)@
+~+         .diskCacheStrategy(DiskCacheStrategy.ALL)~
+          .into(holder.image);
+ }}
+\end{lstlisting}
+  \caption{Loop-based redundant image decoding in AntennaPod pull request 1071 (simplified)}
+  \label{pattern2}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{lstlisting}
+ public class PreviewActivity extends AppCompatActivity {
+   protected void onCreate() {
+     mediaUri = media.getUrl();
+     loadImage(mediaUri); }
+   private void loadImage(String mediaUri) {
+@-    byte[] bytes = ImageUtils.createThumbnail(Uri.parse(mediaUri), ...);@
+~+    new LocalImageTask(mediaUri, size).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);~
+@-    Bitmap bmp = BitmapFactory.decodeByteArray(bytes, ...);@
+   } }
+~+  private class LocalImageTask extends AsyncTask<...> {~
+~+    protected Bitmap doInBackground(Void... params) {~
+~+      byte[] bytes = ImageUtils.createThumbnailFromUri(..., Uri.parse(mMediaUri);~
+~+      return BitmapFactory.decodeByteArray(bytes, ...);~
+   } }
+ public class ImageUtils {
+   public static byte[] createThumbnail(Uri imageUri, ...) {
+     Bmp = BitmapFactory.decodeFile(imageUri, ...);
+   } }
+\end{lstlisting}
+	\caption{Image decoding in UI event handlers in WordPress issue 5777 (simplified)}
+	\label{pattern3}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{lstlisting}
+ public class CoverAdapter<T> extends ArrayAdapter<T> {
+   public View getView(...) {
+     a = objects.get(position));
+     ImageView cover = v.findViewById(R.id.coverImage);
+     imageDownloader.download(a.getImageUrl(), cover);
+ }
+ public class ImageDownloader {
+   public void download(String url,ImageView imageView) {
+     String filename = String.valueOf(url.hashCode());
+     File f = new File(getCacheDirectory(imageView.getContext()), filename);
+     Bitmap bt = null;    	 
+     bt = (Bitmap)imageCache.get(f.getPath());
+     if (bt == null){
+       bt = BitmapFactory.decodeFile(f.getPath());
+@-      imageCache.put(..., bt);@
+~+      imageCache.put(..., new WeakReference<Bitmap>(bt));~
+       imageView.setImageBitmap(bt);
+ }}}
+\end{lstlisting}
+	\caption{Unbounded image caching in Atarashii issue 6 (simplified)}
+	\label{pattern4}
+\end{figure}
+
+\smalltitle{Image decoding without resizing}
+IID issues are likely to present if an image potentially from external sources (like network or file system) is decoded with its \emph{original} size.
+Furthermore, external-source image displaying is specific as a few APIs,
+which can be detected by a pattern-based analysis.
+
+Surprisingly, this simple anti-pattern already covers 38/162 (23.4\%) of all studied IID issues.
+Fig.~\ref{pattern1} gives such an example, in which displaying the thumbnail of a network image may unnecessarily consume about 128MB of memory in decoding (using the image decoding API \code{decodeFile()} at Line 3) and result in app crash. One developer later fixed this issue by resizing the image's resolution according to the actual UI widget used for displaying it (by invoking \code{createThumbnail()} for resizing images) to reduce unnecessary memory consumption (Lines 4--6).
+
+\input{sections/rules}
+
+\smalltitle{Loop-based redundant image decoding}
+IID issues also frequently occur when an image is unintentionally decoded multiple times in a loop. Particularly, Android apps often use some common components (e.g., ListView, GridView, and RecyclerView) to display a scrolling list of images, and these components are all associated with callback methods, which can be frequently invoked.
+
+This anti-pattern covers 36/162 (22.2\%) of all studied IID issues. Fig.~\ref{pattern2} gives an example, in which the method \code{getView()} of the Android \code{ListView} adapter was frequently invoked during the Android app execution (Line 2). \emph{Glide} is a popular third-party library used for image displaying and its method \code{diskCacheStrategy(DiskCacheStrategy.SOURSE)} specifies that its decoded image read from \code{podcast.getLogoUrl()} will not be cached and reused (Lines 5 and 7). In this issue, when its user browses a list of images and slides up and down, a lot of images would be decoded repeatedly and result in high unnecessary runtime overhead, leading to GUI lagging. One developer later fixed this issue by modifying \code{DiskCacheStrategy.SOURSE} to \code{DiskCacheStrategy.ALL} (Lines 7--8). Then \code{Glide} can cache and reuse its decoded images, avoiding GUI lagging.
+
+\smalltitle{Image decoding in UI event handlers}
+Image decoding in the UI thread also contributes to a significant amount of studied IID issues,
+which are found to invoke (directly or indirectly) image decoding APIs in an UI event handler.
+
+This anti-pattern covers 18/162 (11.1\%) of all studied IID issues. Fig.~\ref{pattern3} gives such an example, in which a big image read from a local location was decoded in the UI thread and caused the concerned app to run slowly (similar to the code snippet example of \emph{Image decoding without resizing's} in Fig.~\ref{pattern1}). In this issue, two methods \code{createThumbnail()} and \code{decodeByteArray()} are used to decode an image read from a URL site \code{mediaUri} (Lines 6 and 8) in method \code{loadImage()}, which was invoked by a callback method \code{onCreate()}, which was then invoked in the UI thread. This caused the situation that the image decoding was actually in the UI thread and resulted the UI blocking. To fix this issue, one developer later moved the image decoding to a background thread (Lines 7 and 10--13).
+
+\smalltitle{Unbounded image caching}
+Finally, an incorrectly implemented unbounded cache, in which a pool of decoded images is maintained but no image can be released, is another source of IID issues, since the ever-increasing cache size would cause memory bloat or \code{OutOfMemoryError}.
+
+This anti-pattern covers 7/162 (4.3\%) of all studied IID issues. Fig.~\ref{pattern4} gives such an example, in which an app crashed because of \code{OutOfMemoryError} after its user browsed many images. The cause is that the app's image cache \code{imageCache} was wrongly implemented such that it gathered all decoded images without any image releasing. This made the app's memory consumption keep increasing and quickly exceed an Android device's memory bound (Line 15). Its developer later fixed this issue by adding a soft reference in the image cache so that the cached images could be correctly released when memory usage was tight (Line 16).
+
+\subsubsection{RQ4: How did developers inappropriately implement image displaying?} \label{subsec:rq4-answer}
+
+To understand how developers inappropriately implement image displaying in their Android apps, we analyzed the code slices and patches of IID issues.
+We found that the inappropriate implementation of image displaying can be categorized into two general types: third-party library-specific IID issues and custom implementation-specific IID issues. 
+The former type of inappropriate implementations occur when developers using third-party libraries for image displaying, while the latter type of inappropriate implementations can occur when developers customize the functionality they need. Then we further categorized the two types of inappropriate implementation into subtypes according to their respective implementations.
+
+\smalltitle{Third-party library-specific IID issues}
+Third-party libraries used for image displaying are commonly used in Android apps to reduce implementation efforts. 
+We found that **\% percent IID issues are third-party library-specific. Android platform has managed to form a massive and active community of developers in just few years, and the community provides many popular open-source third-party libraries to developers to ease the implementation of image displaying. In practice, it is generally impossible for developers to get familiar with the specification of each third-party library before developing apps. Therefore, they can easily make mistakes when using unfamiliar third-party libraries and IID issues can arise in such cases. 
+We identified two primary reasons for the prevalence of these issues in Android apps: (1) using unsuitable third-party libraries, and (2) third-party library API misuses.
+
+\begin{itemize}  
+	\item \emph{Using unsuitable third-party libraries.}
+	Out of the 162 IID issues, ** (**\%) issues were caused by using unsuitable third-party libraries. For the third-party libraries used for image displaying, they have different implementation logics and functional emphasis to handle different image displaying scenarios. So for different Android apps that have different execution environments, developers should choose libraries that fits their actual needs. However, many Android apps contain IID issues because of using unsuitable third-party libraries that cannot handle the image display scenes they encounter. 
+	For example, Glide are fast and efficient open source media management and image loading library for Android that wraps media decoding, memory and disk caching, and resource pooling into a simple and easy to use interface. ...
+	
+	\item \emph{Third-party library API misuses.} 
+	** (**\%)IID issues were caused by third-party library API misuses. Third-party libraries provide mangy functional configuration options for developers to ease app development. In practice, it is generally impossible for developers to get familiar with the specification of each third-party library API before developing apps, and many developers don't fully consider the running environment that Android apps may encounter. Therefore, developers can easily make mistakes when using unfamiliar third-party libraries and IID issues can arise because of third-party library API misuses. The third-party library API misuses consist of two parts: (1) Lacking necessary third-party library API calls. \TODO{add the description};(2) Setting inappropriate API parameter values. For the same API, different value setting can lead to different runtime performance. Such diversity of value setting configuration can easily lead to IID issues, if app developers do not carefully deal with all runtime environments. For example,...
+	
+	
+\end{itemize}
+
+\smalltitle{Custom implementation-specific IID issues}
+Many Android developers choose to customize the implementation of image displaying to facilitate maintenance and meet specific functional requirements. 
+As a result, it brings burden to app developers, who need to ensure that their apps correctly implement the requirements. Unfortunately, this is a non-trivial task and can easily cause IID issues. 
+We found ** such IID issues in our dataset and identified two primary reasons for the prevalence of these issues in Android apps: (1) lack of necessary functions, and (2) inappropriate function implementations.
+
+\begin{itemize}  
+		
+	\item \emph{Lack of necessary functions.} 
+	** (**\%) IID issues were caused by lacking necessary functions. It is common that a complete image displaying process includes several sub-functional modules. When dealing with image displaying, developers will encounter a variety of running scenarios, such as displaying a large number of images and displaying high resolution images. In order to handle these running scenarios well, developers need to include the necessary function modules in their image display process, such as image caching and image resizing. Hovever, many developers lack experience with efficient image displaying development or don't fully consider the running scenarios that Android apps may encounter, resulting in lacking necessary sub-functional modules in their custom implementation of image displaying and causing IID issues. For example,...
+	
+	
+	\item \emph{Inappropriate function implementations.}
+    ** (**\%) IID issues were caused by inappropriate function implementations. The process of image displaying in Android apps is performance-critical and energy-consuming, and implementing an efficient image displaying is a non-trivial task. 
+    In practice, developers' custom implementation of image displaying are often problematic, and it is impractical for developers to conduct adequate image displaying tests covering all running scenarios such that IID issues can be easily left undetected before the release of their apps. The inappropriate function implementations consist of two parts: (1) Inappropriate implementation logic; (2) Inappropriate value settings.
+    %In many cases, although developers used the right implementation logics, they set unreasonable values for the parameters in the API, leading to IID issues. Different value setting can lead to different runtime performance. Such diversity of value setting configuration can easily lead to IID issues, if app developers do not carefully deal with all runtime environments. For example, 
+    
+	
+\end{itemize}
+
+%Summary: Based on our experience from the manual investigation, we identified application-level inappropriate implement of image displaying adopted by developers, and some of the patterns are trivial and evident patterns, which raise the opportunity of automatically detecting IID issues. These patterns can help us develop approaches to automatically expose IID issues in the source code. Also, our findings allowed us to propose a set of guidelines and patterns for the development of image displaying.
+
+
+\subsubsection{RQ5: How did developers fix IID issues?} \label{subsec:rq5-answer}
+
+By analyzing the patches applied to the 162 IID issues in our dataset, we identified the fixing actions applied by the developers to fix the IID issues, which can be a firm basis for developing effective automated program repair techniques for fixing IID issues for follow-up studies. In summary, we identified five common fixing patterns from our dataset.
+
+\smalltitle{Adding necessary functions.}
+The most common fixing action (** out of 162 patches, **\%) is to add necessary functions, because many developers lack the experience to implement efficient image displays, their implementations often lack some necessary functionality. This is a common patching strategy for custom implementation-specific IID issues.
+
+\smalltitle{Using third-party libraries instead of custom implementations.}
+Many developers lack the experience to implement an efficient image display, and it is time-consuming for them to locate and fix IID issues by themselves. As a result, many developers chose to replace their custom implementations with mature third-party libraries.
+
+\smalltitle{Replacement of third-party libraries.}
+Different third-party libraries have different performance on different image displaying running scenarios. 
+When developers found that the third-party libraries they originally used cannot effectively handle more complex image displaying scenarios, they chose to use more suitable third-party libraries to replace the third-party libraries used before.
+
+\smalltitle{Modifying value settings.}
+\TODO{}
+
+\smalltitle{Modifying function implementations.}
+\TODO{}
+
+The remaining patches are app-specific fixing actions and strongly related to the context of the IID issues.
+
+

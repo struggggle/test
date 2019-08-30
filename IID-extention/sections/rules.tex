@@ -1,0 +1,32 @@
+\newcommand{\ruledesc}[1]{(\emph{#1})}
+
+\begin{table*}
+\centering
+\caption{Static IID anti-pattern rules for IID issue-inducing APIs.}
+\label{tab:rules}
+\begin{tabular}{cp{.3\textwidth}p{.6\textwidth}}
+\toprule
+\rowhead \# & Issue-inducing API & Anti-pattern rule \\
+\midrule
+\odrow  1 & \scriptsize\texttt{decode\{File, FileDescriptor, Stream, ByteArray, Region\}}
+        & \ruledesc{Image decoding without resizing} An external image is decoded with a \texttt{null} value of \texttt{BitmapFactory.Options}, or the fields in the option satisfy $\texttt{inJustDecodeBounds}=0$ and $\texttt{inSampleSize}\ge1$. \\
+\evrow  2 & \scriptsize\texttt{decode\{File, FileDescriptor, Stream, ByteArray, Region\}}, \newline \texttt{create\{FromPath, FromStream\}}, 
+        \newline \texttt{Glide.diskCacheStrategy}
+        & \ruledesc{Loop-based redundant image decoding} An external image is decoded (directly or indirectly) in \texttt{getView}, \texttt{onDraw}, \texttt{onBindViewHolder}, \texttt{getGroupView}, \texttt{getChildView}. However, if the developer explicitly stores decoded images in a cache (e.g., using \texttt{LruCache.put}), we do not consider this case as IID. \\
+
+\odrow  3 & \scriptsize\texttt{Glide.load}, \newline \texttt{Glide.diskCacheStrategy}
+        & \ruledesc{Loop-based redundant image decoding} An external image is decoded (directly or indirectly) in \texttt{getView}, \texttt{onDraw}, \texttt{onBindViewHolder}, \texttt{getGroupView}, \texttt{getChildView}. However, if the developer explicitly sets the argument of \texttt{Glide.diskCacheStrategy} to be \texttt{DiskCacheStrategy.ALL}, we do not consider this case as IID. \\
+
+\evrow  4 & \scriptsize\texttt{decode\{File, FileDescriptor, Stream, ByteArray, Region\}}, \newline \texttt{create\{FromPath, FromStream\}}, \texttt{setImage\{URL, ViewUri\}}
+        & \ruledesc{Image decoding in UI event handlers} An external image is decoded but is \emph{not} invoked in an asynchronous method: overridden \texttt{Thread.run}, \texttt{AsyncTask.doInBackground}, or \texttt{IntentService.onHandleIntent}.  \\
+\odrow  5 & \scriptsize\texttt{decode\{File, FileDescriptor, Stream, ByteArray, Region\}}, \newline \texttt{create\{FromPath, FromStream\}}
+        & \ruledesc{Unbounded image caching} An external image is decoded and added to an image cache by \texttt{LruCache.put()}, but there is no subsequent invocation to \texttt{LruCache.evictAll()} or \texttt{LruCache.remove()}. \\
+\midrule
+\evrow  6 & \scriptsize\texttt{universalimageloader.core.ImageLoader. \newline getInstance().displayImage}
+        & \ruledesc{Unbounded image caching} There exists method invocation to \texttt{ImageLoaderConfiguration.\allowbreak{}Builder.\{memoryCache, diskCache\}}, but there is no subsequent invocation to \texttt{clearMemoryCache} or \texttt{removeFromCache}. \\
+\odrow  7 & \scriptsize\texttt{Glide.load} 
+        & \ruledesc{Unbounded image caching} Caching images by \texttt{Glide.diskCacheStrategy} with
+        \texttt{DiskCache Strategy.\{SOURCE, RESULT, ALL\}}, but there is no subsequent invocation to \texttt{clearDiskCache}.\\%.diskCacheStrategy
+\bottomrule
+\end{tabular}
+\end{table*}

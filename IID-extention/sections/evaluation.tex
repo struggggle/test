@@ -1,0 +1,144 @@
+\section{Evaluation} \label{sec:evaluation}
+
+In this section, we present the experimental setup (Section~\ref{subsec:eval-setup}) and results (Sections~\ref{subsec:eval-result} and~\ref{subsec:eval-realworld}) for evaluating TAPIR with:
+(1) a set of studied IID issues with issue-inducing \code{apk}s available, and
+(2) the latest version of all studied 243 apps,
+followed by a threat analysis (Section~\ref{subsec:threats}).
+
+\subsection{Experimental Setup} \label{subsec:eval-setup}
+
+To validate the effectiveness of TAPIR,
+we collected the \code{apk} archives of all studied apps that have historical \code{apk}s available
+(particularly, the \code{apk}s exactly correspond to our earlier IReps/PRs in our earlier empirical study).
+This collection process led to a total of 19 confirmed IID issues from nine Android apps, which were used as a ground truth to evaluate whether TAPIR can successfully detect the concerned IID issues.
+These numbers (19 and 9) seem not large, and it is true that in theory one should be able to compile each IID issue's corresponding app's source code for experiments. However, in practice the dependencies of the concerned Android apps could not be easily resolved, and some large apps failed for compilation due to their stale dependencies.
+To reduce the possible bias that can be caused by our manual modifications to the apps' dependencies, we chose for experiments only those apps whose \code{apk}s are available corresponding to the studied IID issues and do not suffer from any dependency issue.
+
+Besides, to further evaluate TAPIR's capability of detecting real-world IID issues,
+we applied it to the latest versions\footnote{The latest \code{apk} build is always available on F-Droid.} of all the 243 Android apps used in the empirical study
+to see whether TAPIR can detect previously unknown IID issues. For each TAPIR's reported IID issue, 
+we manually inspected it for confirmation. We submitted the issues confirmed by us to their respective GitHub issue tracking systems for final validation by responsible developers.
+
+In the IID issue reporting process, as most IID issues detected by TAPIR (in an anti-pattern way) are obvious and easy to fix, we did not attach respective patches or open pull requests. We let app developers judge the validity of our reported issues on their own, rather than potentially misleading them by trivial patches. We also obtained some interesting findings, which will be presented later.
+
+Note that in the experiments we applied TAPIR only to analyze the image displaying code of the main logics in the selected apps, i.e., skipping the parts related to third-party libraries, which are out of the apps’ local source trees. We conducted all experiments on a commodity PC with an Intel Core i7-6700 processor and 16GB RAM.
+
+\subsection{Effectiveness Validation Results} \label{subsec:eval-result}
+
+\input{sections/tab-effectiveness}
+
+The overall evaluation results are shown in TABLE~\ref{subject_part_1}.
+All evaluated 19 IID issues belong to three anti-patterns.
+TAPIR should either correctly detect an IID issue as an anti-pattern instance (i.e., true positive, TP),
+or fail to detect it (i.e., false negative, FN).
+The results show that TAPIR correctly identified all the 19 IID issues without any false negative report.
+Although we have difficulties in evaluating TAPIR against all studied IID issues as explained earlier,
+we have tried our best to reduce potential bias and the results may reflect the effectiveness of TAPIR to some extent.
+
+We note that in practice TAPIR may possibly detect previously unknown IID issues in these app versions. However, we are unable to examine them in this part of the evaluation due to the lack of a ground truth of all IID issues in these apps' historical versions. Still,
+we conducted such examination on the latest versions of all 243 studied apps as our second part of evaluation.
+
+\subsection{Applying TAPIR in Practice}  \label{subsec:eval-realworld}
+
+\subsubsection{Evaluation Results and Developers' Feedback}
+
+\input{sections/tab-cases}
+
+Applying TAPIR to the latest version of the 243 apps
+returned 45 anti-pattern warnings in 16 apps.
+We manually inspected each warning and categorized it either as a real IID issue (i.e., true positive, TP) or a spurious warning (i.e., false positive, FP).
+For each TP, we also reported it to its responsible developers.
+The overall results are listed in TABLE \ref{subject_part_2}.
+
+43 of 45 warnings were manually confirmed to be true instances of anti-patterns,
+achieving an anti-pattern discovery precision of 95.6\%.
+For the FP case of Qkstms
+in which an image is decoded by \code{decodeByteArray()} without resizing, such an image is, however, not from an external source.
+TAPIR failed to analyze the \code{Options} parameter of \code{decodeByteArray} which contains resized geometries,
+and thus conservatively reported it as an IID issue.
+The FP in Owncloud is also due to the limitation of static analysis:
+displayed images are from a disk cache, which stores already resized images.
+
+We enclosed the 43 issues into 20 issue reports, and submitted them to respective developers
+(with descriptions of the issues and associated anti-patterns)
+for their judgement on the validity of these anti-pattern-based IID issues. The last column in Table~\ref{subject_part_2} shows the reported IRep IDs.
+So far, we have received feedback from the developers on 27 issues.
+The remaining 16 reported IID issues are still pending (their concerned apps may no longer be under active maintenance).
+
+Among the issues with feedback,
+16/27 (59.3\%) were confirmed as real performance threats, and 13 of the 16 IID issues (81.3\%) have already been fixed by developers.
+This indicates that TAPIR can indeed detect quite a few new IID issues that affect the performance in real-world Android apps. This results also practically validates the effectiveness of the summarized anti-pattern rules in our empirical study.
+
+For the remaining 11 IID issues, developers held various conservative attitudes as discussed below:
+
+\begin{enumerate}
+  \item Most developers rejecting our reports thought that the performance impact might be negligible, and would only be convinced if we can provide further evidence about the performance degradation.
+  For example, Aphotomanager's developers acknowledged that their app may encounter performance degradation in some cases, but should be sufficiently fast and thus currently do not plan to fix them.
+  \item Some developers acknowledged the reported issues, but they claimed to have higher-priority tasks than performance optimization.
+\end{enumerate}
+
+Later we shall see how developers have overlooked the severity of our reported IID issues,
+and in fact seemingly minor IID issues can indeed cause poor app experience.
+These results suggest that the future work along this line may focus on systematic generation of testing workloads for manifesting IID issues.
+Note that we could not have obtained such these findings if we attached trivial patches in the IReps, since developers would be inclined to accept free (and obviously correct) patches for better performance.
+
+\subsubsection{Real-world IID Issue Cases}
+
+\smalltitle{WordPress}
+The first case is from WordPress, which is one of the most popular blogging apps.
+TAPIR identified two anti-pattern instances of image decoding without resizing and thus one issue report was composed.
+However, the app's developers did not realize the severity of our reported issue,
+and marked it as low priority.
+
+Two months later,
+a user reported an image-related bug that WordPress crashed when loading a large image.
+The developers then made extensive efforts in diagnosing this issue,
+and proposed several fixes.
+However, twenty days later, another user encountered a similar problem with the same triggering condition.
+The developers once again attempted to diagnose its root cause,
+but did not reach a clear verdict%
+\footnote{\url{https://github.com/wordpress-mobile/WordPress-Android/issues/5701}.}.
+
+For this interesting case,
+we applied TAPIR to the latest version of WordPress and detected one previously detected and two new IID issues, which all belong to the anti-pattern of \emph{image decoding without resizing}.
+We reported all three issues and the developers quickly fixed two of them in three days%
+\footnote{Developers consider one report as false positive because they have control of the external image size.}.
+After fixing these TAPIR's reported issues,
+similar image-related performance issues have never been reported again since July 2017 until the day this paper was written.
+
+This case suggests that providing consequence verification may make developers more active in dealing with our reported IID issues. In addition, IID issues can be more complicated than one expected.
+Developers may have overlooked the actual difficulty of diagnosing such issues, and ad-hoc fixings may not be efficient in addressing IID issues.
+
+\smalltitle{KISS}
+The second case is from KISS, an Android app launcher with searching functionalities, the consequences of whose suffered IID issue might have also been overlooked by its developers. TAPIR detected the anti-pattern of \emph{loop-based redundant image decoding} in KISS, and thus we reported this issue to its developers%
+\footnote{\url{https://github.com/Neamar/KISS/issues/570}.}.
+Unfortunately, the developers explicitly rejected our proposal due to the concern that they believe that the performance impact would be minor and KISS should be kept simple and lightweight.
+ 
+Interestingly, a year and a half later, one of KISS users encountered and complained a show image displaying problem%
+\footnote{\url{https://github.com/Neamar/KISS/issues/1054}.}.
+Then the developers noticed this and decided that this is truly due to our mentioned IID issue. So they quickly fixed this issue.
+This encouraging result suggests that pattern-based program analysis can be naturally effective for defending against practical IID issues in Android apps.
+
+\subsection{Threats to Validity} \label{subsec:threats}
+
+We analyze potential threats to the validity of our empirical study and experimental conclusions about TAPIR.
+
+\smalltitle{Subject selection}
+Our empirical study is based on 162 IID issues from 243 open-source Android apps,
+which, although having a not-small number, may not be completely representative of all IID issues in practice.
+Nevertheless, we collected these IID issues from well-maintained popular open-source Android apps covering diverse categories to reduce such threats.
+Furthermore, the evaluation of TAPIR shows that these issues indeed helped detect both previously known and unknown IID issues in practice.
+
+\smalltitle{Limitations of TAPIR}
+TAPIR is lightweight (lacking the full path sensitivity) and identifies only the extracted code anti-patterns.
+Therefore, it may report spurious warnings (false positives) or miss certain anti-patterns (false negatives).
+We intentionally design TAPIR to be simple,
+and the evaluation already demonstrates its effectiveness in detecting IID issues.
+One future work is to develop more sophisticated static and/or dynamic analyses to more precisely detect IID issues.
+
+\smalltitle{Custom implementation of image displaying}
+As mentioned earlier, this work does not consider the source code in third-party libraries used by studied Android apps,
+which could be another source of IID issues.
+Developers may also have used ad-hoc implementations for image displaying,
+causing obstacles to our pattern-based analysis.
+This aspect of IID issue detection can be a potential future direction.

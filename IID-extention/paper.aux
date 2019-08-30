@@ -1,0 +1,214 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{handle_image}
+\citation{performance}
+\providecommand \oddpage@label [2]{}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}}
+\citation{liu2014characterizing,carette2017investigating,wang2016profiling,linares2015developers,Liu:SW15}
+\citation{kwon2013mantis,gao2017every}
+\citation{f-droid}
+\citation{li2019characterizing}
+\citation{handle_image}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Background}{3}{section.2}}
+\newlabel{sec:background}{{2}{3}{Background}{section.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Image Displaying in Android Apps}{3}{subsection.2.1}}
+\citation{Android_framework}
+\citation{wang2016profiling}
+\citation{image_size}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Inefficient Image Displaying (IID)}{4}{subsection.2.2}}
+\citation{liu2016understanding,hu2018tale}
+\citation{f-droid}
+\citation{f-droid}
+\citation{linares2015developers,wang2016profiling}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Empirical Study}{5}{section.3}}
+\newlabel{sec:study}{{3}{5}{Empirical Study}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Methodology}{5}{subsection.3.1}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1}Dataset collection}{5}{subsubsection.3.1.1}}
+\newlabel{subsec:dataset-collection}{{3.1.1}{5}{Dataset collection}{subsubsection.3.1.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces The IID issue collection process}}{5}{figure.1}}
+\newlabel{fig:issue_collection}{{1}{5}{The IID issue collection process}{figure.1}{}}
+\citation{traceability}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.2}Analyzing the IID issues}{7}{subsubsection.3.1.2}}
+\newlabel{subsec:issue-analysis}{{3.1.2}{7}{Analyzing the IID issues}{subsubsection.3.1.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Empirical Study Results}{8}{subsection.3.2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.1}RQ1: What are the triggering conditions and consequences of IID issues?}{8}{subsubsection.3.2.1}}
+\citation{liu2014characterizing}
+\citation{wu2016light}
+\citation{gao2017every}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.2}RQ2: What are the root causes of IID issues?}{10}{subsubsection.3.2.2}}
+\newlabel{subsec:rq2-answer}{{3.2.2}{10}{RQ2: What are the root causes of IID issues?}{subsubsection.3.2.2}{}}
+\citation{handle_image}
+\citation{xu2008precise,yan2014leakchecker}
+\citation{wu2016light,gao2017every}
+\newlabel{lst1:mxm}{{3.2.3}{11}{}{lstlisting.-1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Image decoding without resizing in WordPress issue 5701 (simplified)}}{11}{figure.2}}
+\newlabel{pattern1}{{2}{11}{Image decoding without resizing in WordPress issue 5701 (simplified)}{figure.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.3}RQ3: Are there common anti-patterns for IID issues?}{11}{subsubsection.3.2.3}}
+\newlabel{subsec:rq3-answer}{{3.2.3}{11}{RQ3: Are there common anti-patterns for IID issues?}{subsubsection.3.2.3}{}}
+\newlabel{lst1:mxm}{{3.2.3}{12}{}{lstlisting.-2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Loop-based redundant image decoding in AntennaPod pull request 1071 (simplified)}}{12}{figure.3}}
+\newlabel{pattern2}{{3}{12}{Loop-based redundant image decoding in AntennaPod pull request 1071 (simplified)}{figure.3}{}}
+\newlabel{lst1:mxm}{{3.2.3}{12}{}{lstlisting.-3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Image decoding in UI event handlers in WordPress issue 5777 (simplified)}}{12}{figure.4}}
+\newlabel{pattern3}{{4}{12}{Image decoding in UI event handlers in WordPress issue 5777 (simplified)}{figure.4}{}}
+\newlabel{lst1:mxm}{{3.2.3}{12}{}{lstlisting.-4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Unbounded image caching in Atarashii issue 6 (simplified)}}{12}{figure.5}}
+\newlabel{pattern4}{{5}{12}{Unbounded image caching in Atarashii issue 6 (simplified)}{figure.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Static IID anti-pattern rules for IID issue-inducing APIs.}}{13}{table.1}}
+\newlabel{tab:rules}{{1}{13}{Static IID anti-pattern rules for IID issue-inducing APIs}{table.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.4}RQ4: How did developers inappropriately implement image displaying?}{15}{subsubsection.3.2.4}}
+\newlabel{subsec:rq4-answer}{{3.2.4}{15}{RQ4: How did developers inappropriately implement image displaying?}{subsubsection.3.2.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.5}RQ5: How did developers fix IID issues?}{16}{subsubsection.3.2.5}}
+\newlabel{subsec:rq5-answer}{{3.2.5}{16}{RQ5: How did developers fix IID issues?}{subsubsection.3.2.5}{}}
+\citation{Android_API}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Static Detection of IID Issues}{17}{section.4}}
+\newlabel{sec:detection}{{4}{17}{Static Detection of IID Issues}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}IID Issue Anti-pattern Rules}{17}{subsection.4.1}}
+\newlabel{subsec:tapir-design}{{4.1}{17}{IID Issue Anti-pattern Rules}{subsection.4.1}{}}
+\citation{soot}
+\citation{dex2jar}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}The TAPIR Static Analyzer}{18}{subsection.4.2}}
+\newlabel{subsec:tapir-impl}{{4.2}{18}{The TAPIR Static Analyzer}{subsection.4.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Evaluation}{19}{section.5}}
+\newlabel{sec:evaluation}{{5}{19}{Evaluation}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Experimental Setup}{19}{subsection.5.1}}
+\newlabel{subsec:eval-setup}{{5.1}{19}{Experimental Setup}{subsection.5.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Effectiveness Validation Results}{19}{subsection.5.2}}
+\newlabel{subsec:eval-result}{{5.2}{19}{Effectiveness Validation Results}{subsection.5.2}{}}
+\citation{OpenNoteScanner}
+\citation{Subsonic}
+\citation{WordPress}
+\citation{PhotoAffix}
+\citation{Kontalk}
+\citation{OneBusAway}
+\citation{NewPipe}
+\citation{MoneyManagerEx}
+\citation{BlueAlliance}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Effectiveness Validation Results. Each known IID issue is either a true positive (TP) or a false negative (FN).}}{20}{table.2}}
+\newlabel{subject_part_1}{{2}{20}{Effectiveness Validation Results. Each known IID issue is either a true positive (TP) or a false negative (FN)}{table.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Applying TAPIR in Practice}{21}{subsection.5.3}}
+\newlabel{subsec:eval-realworld}{{5.3}{21}{Applying TAPIR in Practice}{subsection.5.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.1}Evaluation Results and Developers' Feedback}{21}{subsubsection.5.3.1}}
+\citation{Newsblur}
+\citation{WordPress}
+\citation{Seadroid}
+\citation{MPDroid}
+\citation{Aphotomanager}
+\citation{Conversations}
+\citation{Owncloud}
+\citation{OpenNoteScanner}
+\citation{Geopaparazzi}
+\citation{Passandroid}
+\citation{4pdaclient}
+\citation{DocumentViewer}
+\citation{Kiss}
+\citation{Bubble}
+\citation{Qksms}
+\citation{Photoview}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces List of 43 Previously Unknown IID issues found by applying TAPIR to the latest versions of the 243 studied apps.}}{22}{table.3}}
+\newlabel{subject_part_2}{{3}{22}{List of 43 Previously Unknown IID issues found by applying TAPIR to the latest versions of the 243 studied apps}{table.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.2}Real-world IID Issue Cases}{24}{subsubsection.5.3.2}}
+\citation{huang2010anatomizing}
+\citation{liu2014characterizing}
+\citation{nejati2016depth}
+\citation{huang2017shuffledog}
+\citation{rosen2017push}
+\citation{wang2016profiling}
+\citation{carette2017investigating}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Threats to Validity}{25}{subsection.5.4}}
+\newlabel{subsec:threats}{{5.4}{25}{Threats to Validity}{subsection.5.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Related Work}{25}{section.6}}
+\newlabel{sec:related-work}{{6}{25}{Related Work}{section.6}{}}
+\citation{kwon2013mantis}
+\citation{qian2011profiling}
+\citation{ravindranath2012appinsight}
+\citation{zhang2013panappticon}
+\citation{nistor2014suncat}
+\citation{lin2014retrofitting}
+\citation{kang2016diagdroid}
+\citation{liu2014characterizing}
+\citation{gao2017every}
+\citation{lee2015outatime}
+\citation{huang2017shuffledog}
+\citation{zhao2018leveraging}
+\citation{lyu2018remove}
+\citation{nguyen2015reducing}
+\bibstyle{IEEEtran}
+\bibdata{IEEEabrv,iid}
+\bibcite{handle_image}{1}
+\bibcite{performance}{2}
+\bibcite{liu2014characterizing}{3}
+\bibcite{carette2017investigating}{4}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{27}{section.7}}
+\newlabel{sec:conclusion}{{7}{27}{Conclusion}{section.7}{}}
+\bibcite{wang2016profiling}{5}
+\bibcite{linares2015developers}{6}
+\bibcite{Liu:SW15}{7}
+\bibcite{kwon2013mantis}{8}
+\bibcite{gao2017every}{9}
+\bibcite{f-droid}{10}
+\bibcite{li2019characterizing}{11}
+\bibcite{Android_framework}{12}
+\bibcite{image_size}{13}
+\bibcite{liu2016understanding}{14}
+\bibcite{hu2018tale}{15}
+\bibcite{traceability}{16}
+\bibcite{wu2016light}{17}
+\bibcite{xu2008precise}{18}
+\bibcite{yan2014leakchecker}{19}
+\bibcite{Android_API}{20}
+\bibcite{soot}{21}
+\bibcite{dex2jar}{22}
+\bibcite{OpenNoteScanner}{23}
+\bibcite{Subsonic}{24}
+\bibcite{WordPress}{25}
+\bibcite{PhotoAffix}{26}
+\bibcite{Kontalk}{27}
+\bibcite{OneBusAway}{28}
+\bibcite{NewPipe}{29}
+\bibcite{MoneyManagerEx}{30}
+\bibcite{BlueAlliance}{31}
+\bibcite{Newsblur}{32}
+\bibcite{Seadroid}{33}
+\bibcite{MPDroid}{34}
+\bibcite{Aphotomanager}{35}
+\bibcite{Conversations}{36}
+\bibcite{Owncloud}{37}
+\bibcite{Geopaparazzi}{38}
+\bibcite{Passandroid}{39}
+\bibcite{4pdaclient}{40}
+\bibcite{DocumentViewer}{41}
+\bibcite{Kiss}{42}
+\bibcite{Bubble}{43}
+\bibcite{Qksms}{44}
+\bibcite{Photoview}{45}
+\bibcite{huang2010anatomizing}{46}
+\bibcite{nejati2016depth}{47}
+\bibcite{huang2017shuffledog}{48}
+\bibcite{rosen2017push}{49}
+\bibcite{qian2011profiling}{50}
+\bibcite{ravindranath2012appinsight}{51}
+\bibcite{zhang2013panappticon}{52}
+\bibcite{nistor2014suncat}{53}
+\bibcite{lin2014retrofitting}{54}
+\bibcite{kang2016diagdroid}{55}
+\bibcite{lee2015outatime}{56}
+\bibcite{zhao2018leveraging}{57}
+\bibcite{lyu2018remove}{58}
+\bibcite{nguyen2015reducing}{59}

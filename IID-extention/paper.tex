@@ -1,0 +1,252 @@
+\begin{filecontents*}{example.eps}
+gsave
+newpath
+  20 20 moveto
+  20 220 lineto
+  220 220 lineto
+  220 20 lineto
+closepath
+2 setlinewidth
+gsave
+  .4 setgray fill
+grestore
+stroke
+grestore
+\end{filecontents*}
+\RequirePackage{fix-cm}
+\documentclass[smallextended]{svjour3}       % onecolumn (second format)
+
+\smartqed  % flush right qed marks, e.g. at end of proof
+
+\usepackage{graphicx}
+
+
+%below is added
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{threeparttable}
+\usepackage{fancyvrb}
+\usepackage{booktabs}
+\usepackage[normalem]{ulem}
+\usepackage{balance}
+\usepackage[all]{nowidow}
+\usepackage{adjustbox} 
+\usepackage{lscape}
+
+\usepackage{hyperref}
+\makeatletter
+
+%add again
+\def\UrlAlphabet{%
+	\do\a\do\b\do\c\do\d\do\e\do\f\do\g\do\h\do\i\do\j%
+	\do\k\do\l\do\m\do\n\do\o\do\p\do\q\do\r\do\s\do\t%
+	\do\u\do\v\do\w\do\x\do\y\do\z\do\A\do\B\do\C\do\D%
+	\do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M\do\N%
+	\do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X%
+	\do\Y\do\Z}
+\def\UrlDigits{\do\1\do\2\do\3\do\4\do\5\do\6\do\7\do\8\do\9\do\0}
+\g@addto@macro{\UrlBreaks}{\UrlOrds}
+\g@addto@macro{\UrlBreaks}{\UrlAlphabet}
+\g@addto@macro{\UrlBreaks}{\UrlDigits}
+\makeatother
+
+\usepackage{listings}
+\lstset{
+	breaklines=true,
+	frame=single,
+	label=lst1:mxm,
+	basicstyle=\scriptsize\ttfamily,
+	keywordstyle=\bfseries,
+	stringstyle=\ttfamily\color{red!50!brown},
+	numberstyle=\tiny\color{gray}\sffamily,
+	xleftmargin=2em,
+	basewidth={0.55em, 0.45em},
+	framexleftmargin=0em,
+	framexrightmargin=-0.5em,
+	numbers=left,
+	language=java,
+	moredelim=**[is][\color{red}]{@}{@},
+	moredelim=**[is][\color{green!60!black}]{~}{~},
+}
+
+% comments
+\usepackage{soul,color,xspace}
+\newcommand{\jyy}[1]{\sethlcolor{yellow}\hl{jyy:#1}\xspace}
+\newcommand{\lwj}[1]{\sethlcolor{green}\hl{lwj:#1}\xspace}
+\newcommand{\TODO}[1]{\sethlcolor{orange}\hl{TODO:#1}\xspace}
+
+%language
+%\usepackage{fontspec, xunicode, xltxtra}  
+
+
+% document parts
+\newcommand{\code}[1]{{\small\texttt{#1}}}
+\newcommand{\smalltitle}[1]{\smallskip\noindent{\textbf{#1}}.}
+\newcommand{\finding}[2]{%
+	\begin{center}%
+		\begin{tikzpicture}%
+		\node[rectangle, draw=#1, top color=#1!5, bottom color=#1!5, rounded corners=2pt, inner xsep=5pt, inner ysep=6pt, outer ysep=10pt]{
+			\begin{minipage}{0.9\columnwidth}#2\end{minipage}};%
+		\end{tikzpicture}%
+	\end{center}%
+}
+
+% table items
+\newcommand{\rowhead}{\rowcolor{white}}
+\newcommand{\odrow}{\rowcolor{gray!15}}
+\newcommand{\evrow}{\rowcolor{white}}
+\newcommand{\cat}[1]{{\scriptsize(#1)}}
+\newcommand{\subj}[1]{#1 \rm\cite{#1}}
+\newcommand{\rev}[1]{\scriptsize{\texttt{#1}}}
+\newcommand{\pending}[1]{{\color{black!70}{\##1}}}
+\newcommand{\reject}[1]{{\color{red}\sout{\##1}}}
+\newcommand{\partrejfix}[1]{{\color{blue}{\bf\##1}%
+		$^\textrm{{\color{blue}partially-fixed}/{\color{red}rejected}}$
+}}
+\newcommand{\confirm}[1]{{\color{blue}{\bf\##1}}}
+\newcommand{\fixed}[1]{{\color{blue}{\bf\##1}$^\textrm{fixed}$}}
+
+\renewcommand{\footnoterule}{
+	\kern -3pt
+	\hrule width 2in
+	\kern 2.6pt
+}
+
+
+%end the add
+
+
+
+%
+% \usepackage{mathptmx}      % use Times fonts if available on your TeX system
+%
+% insert here the call for the packages your document requires
+%\usepackage{latexsym}
+% etc.
+%
+% please place your own definitions here and don't use \def but
+% \newcommand{}{}
+%
+% Insert the name of "your journal" with
+% \journalname{myjournal}
+%
+\begin{document}
+
+\title{Characterizing and Detecting Inefficient Image	Displaying Issues in Android Apps}
+
+\author{Wenjie Li         \and
+	Yanyan Jiang         \and
+	Chang Xu         \and
+	Yepang Liu         \and
+	Xiaoxing Ma         \and
+    Jian Lyu %etc.
+}
+
+
+\institute{Wenjie Li, Yanyan Jiang, Chang Xu, Xiaoxing Ma, Jian Lyu   \at
+              State Key Lab for Novel Software Technology, Nanjing University, Nanjing, China \\
+              \email{wenjielinju@gmail.com, {jyy, changxu}@nju.edu.cn, {xxm, lj}@nju.edu.cn}           %  \\
+%             \emph{Present address:} of F. Author  %  if needed
+           \and
+           Yepang Liu \at
+           Shenzhen Key Laboratory of Computational Intelligence, Department of Computer Science and Engineering, Southern University of Science and Technology, Shenzhen, China\\
+           \email{liuyp1@sustc.edu.cn}
+}
+
+\date{Received: date / Accepted: date}
+
+
+\maketitle
+
+\begin{abstract}
+Mobile applications (apps for short) often need to display images. However, inefficient image displaying (IID) issues are pervasive in mobile apps, and can severely impact app performance and user experience.
+This paper presents an empirical study of 162 real-world IID issues collected from 243 popular open-source Android apps,
+validating the presence and severity of IID issues,
+and then sheds light on these issues' characteristics to support future research on effective issue detection. Based on the findings of this study, we developed a static IID issue detection tool TAPIR and evaluated it with real-world Android apps. The experimental evaluations show encouraging results: TAPIR detected 43 previously-unknown IID issues in the latest version of the 243 apps, 16 of which have been confirmed by respective developers and 13 have been fixed.
+\keywords{Android app \and inefficient image displaying \and performance \and empirical study \and static analysis}
+
+\end{abstract}
+
+\input{sections/introduction}
+
+\input{sections/background}
+
+\input{sections/empirical-study}
+
+\input{sections/study-results} 
+
+\input{sections/detection}
+
+\input{sections/evaluation}
+
+\input{sections/related-work}
+
+\input{sections/conclusion}
+
+\section*{Acknowledgments}
+
+The authors would like to thank the anonymous reviewers for comments and suggestions. 
+This work is supported in part by National Natural Science Foundation of China (Grants \#61690204, \#61802165),
+Science and Technology Innovation Committee Foundation of Shenzhen (Grant No. ZDSYS201703031748284),
+Program for University Key Laboratory of Guangdong Province (Grant No. 2017KSYS008),
+and Collaborative Innovation Center of Novel Software Technology and Industrialization, Jiangsu, China.
+
+
+
+
+\balance
+
+\bibliographystyle{IEEEtran}
+\bibliography{IEEEabrv,iid}
+
+
+%\begin{acknowledgements}
+%If you'd like to thank anyone, place your comments here
+%and remove the percent signs.
+%\end{acknowledgements}
+
+
+% Authors must disclose all relationships or interests that 
+% could have direct or potential influence or impart bias on 
+% the work: 
+%
+% \section*{Conflict of interest}
+%
+% The authors declare that they have no conflict of interest.
+
+
+% BibTeX users please use one of
+%\bibliographystyle{spbasic}      % basic style, author-year citations
+%\bibliographystyle{spmpsci}      % mathematics and physical sciences
+%\bibliographystyle{spphys}       % APS-like style for physics
+%\bibliography{iid}   % name your BibTeX data base
+
+% Non-BibTeX users please use
+
+%\begin{thebibliography}{}
+%
+% and use \bibitem to create references. Consult the Instructions
+% for authors for reference list style.
+%
+%\bibitem{RefJ}
+% Format for Journal Reference
+%Author, Article title, Journal, Volume, page numbers (year)
+% Format for books
+%\bibitem{RefB}
+%Author, Book title, page numbers. Publisher, place (year)
+% etc
+%\end{thebibliography}
+
+\end{document}
+% end of file template.tex
+

@@ -1,0 +1,38 @@
+\begin{landscape}
+\begin{table*}
+\centering
+\caption{List of 43 Previously Unknown IID issues found by applying TAPIR to the latest versions of the 243 studied apps.}%c94b1b5
+\label{subject_part_2}
+\begin{tabular}{ccccccccccc}
+\toprule
+\rowhead App Name \cat{Category, Downloads} & Revision & LOC & AP1 &     AP2 &     AP3 &     AP4 & Submitted Issue Reports \\
+\midrule
+\odrow \it\subj{Newsblur}        \cat{Reading,       50K+}  & \rev{535b879} & 20.1K   &   1 &    1 & 1 & 0 & \reject{977} \\
+\evrow \it\subj{WordPress}       \cat{Internet,      5M+}   & \rev{30ff305} & 95.8K   &   4 &    0 & 0 & 0 & \pending{5232}, \partrejfix{5703} \\
+\odrow \it\subj{Seadroid}        \cat{Internet,    50K+}  & \rev{f5993bd} & 37.9K   &   1 &    0 & 3 & 1 & \pending{616}, \pending{617}, \pending{766} \\
+\evrow \it\subj{MPDroid}         \cat{Multimedia,    100K+} & \rev{9b0a783} & 20.5K   &   1 &    0 & 0 & 0 & \confirm{837} \\
+\odrow \it\subj{Aphotomanager}   \cat{Multimedia,    1K+}   & \rev{9343d84} & 12.4K   &   0 &    1 & 1 & 0 & \reject{74} \\
+\evrow \it\subj{Conversations}   \cat{Internet,      10K+}  & \rev{1c31b96} & 38.0K   &   0 &    2 & 0 & 0 & \fixed{2198} \\
+\odrow \it\subj{Owncloud}        \cat{Internet,  100K+} & \rev{1443902} & 49.1K   &   3(1) & 2 & 1 & 0 & \pending{1862} \\
+\evrow \it\subj{OpenNoteScanner} \cat{Education,     10K+}  & \rev{2640785} & 3.5K    &   0 &    1 & 0 & 0 & \confirm{69} \\
+\odrow \subj{Geopaparazzi}       \cat{Navigation,    10K+}  & \rev{71fd81e} & 89.9K   &   2 &    0 & 0 & 0 & \reject{387} \\
+\evrow \subj{Passandroid}        \cat{Reading,      1M+}   & \rev{1382c6a} & 6.6K    &   3 &    0 & 0 & 0 & \reject{136} \\
+\odrow \subj{4pdaclient}         \cat{Internet,      1M+}   & \rev{a637156} & 41.9K   &   0 &    1 & 1 & 0 & \fixed{25} \\
+\evrow \subj{DocumentViewer}     \cat{Reading,       500K+} & \rev{a97560f} & 49.6K   &   0 &    1 & 2 & 0 & \pending{233} \\
+\odrow \subj{Kiss}               \cat{Theming,       100K+} & \rev{9677dd1} & 5.1K    &   0 &    0 & 1 & 0 & \fixed{570} \\
+\evrow \subj{Bubble}             \cat{Reading,       10K+}  & \rev{9f1e06c} & 3.5K    &   1 &    0 & 0 & 0 & \pending{47} \\
+\odrow \subj{Qksms}              \cat{Communication, 100K+} & \rev{c54c1cc} & 55.3K   &   2(1) & 2 & 2 & 0 & \fixed{718}, \fixed{719} \\
+\evrow  \subj{Photoview}          \cat{Demo,          10K+}  & \rev{6c227ee} & 2.1K    &   0 &   1 & 0 & 0 & \confirm{478} \\
+\midrule
+\rowhead Total & & & 18(2) & 12 & 12 & 1 & \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item An italic app name denotes it previously suffered from IID issues.
+Columns AP1--AP4 respectively denote the number of detected issues related to each anti-pattern.
+Numbers in a bracket are false positives.
+In the last column, bold/stroke-out issues are explicitly confirmed/rejected by the developers, and the remaining ones are open issues.
+\end{tablenotes}
+\end{table*}
+\end{landscape}
+
